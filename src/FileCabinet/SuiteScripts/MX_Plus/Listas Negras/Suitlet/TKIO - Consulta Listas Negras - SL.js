@@ -2,7 +2,7 @@
  * @NApiVersion 2.1
  * @NScriptType Suitelet
  */
-define(['N/log', 'N/record', 'N/search', 'N/ui/serverWidget', 'N/url', 'N/task', 'N/email','N/runtime'],
+define(['N/log', 'N/record', 'N/search', 'N/ui/serverWidget', 'N/url', 'N/task', 'N/email','N/runtime','N/redirect'],
     /**
  * @param{log} log
  * @param{record} record
@@ -12,9 +12,10 @@ define(['N/log', 'N/record', 'N/search', 'N/ui/serverWidget', 'N/url', 'N/task',
  * @param{task} task
  * @param{email} email
  * @param{runtime} runtime
+ * @param{redirect} redirect
  */
 
-    (log, record, search, serverWidget,url,task,email,runtime) => {
+    (log, record, search, serverWidget,url,task,email,runtime,redirect) => {
         /**
          * Defines the Suitelet script trigger point.
          * @param {Object} scriptContext
@@ -67,6 +68,13 @@ define(['N/log', 'N/record', 'N/search', 'N/ui/serverWidget', 'N/url', 'N/task',
                             };
                         var mrTaskID =  mrTask.submit();
                             log.debug('Tarea creada', mrTaskID);
+                            redirect.toSuitelet ({
+                                scriptId: 'customscript_tkio_consulta_list_neg_sl',
+                                deploymentId: 'customdeploy_tkio_consulta_list_neg_sl',
+                                parameters: {
+                                    customrecord_tkio_consulta_list_neg_seg: mrTaskID
+                                }
+                            });
                             record.submitFields({ type: 'customrecord_tkio_consulta_list_neg_seg', id: seguimientoId, values: { custrecord_tkio_listas_negras_taskid: mrTaskID } });
                             try {
                                 email.send({
