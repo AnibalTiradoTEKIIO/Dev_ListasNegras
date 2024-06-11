@@ -154,6 +154,29 @@ define(['N/email', 'N/runtime', 'N/search', 'N/record', '../../lib/access_pac', 
                 log.error({ title: 'Error editaEstado', details: error })
             }
         }
+        function getSearchId(valorFiltro, filtId, searchType) {
+            try {
+                let resId = '';
+                const searchObj = search.create({
+                    type: searchType,
+                    filters:
+                        [
+                            [filtId, search.Operator.IS, valorFiltro]
+                        ],
+                    columns:
+                        [
+                            search.createColumn({ name: "internalId" })
+                        ]
+                });
+                searchObj.run().each(function (result) {
+                    resId = result.getValue({ name: "internalId" }) || ' '
+                });
+                return resId;
+            } catch (error) {
+                log.error({ title: 'error getSearchId', details: error })
+                return ''
+            }
+        }
         return {
             getInputData: getInputData,
             map: map,
