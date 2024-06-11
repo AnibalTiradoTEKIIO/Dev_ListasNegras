@@ -189,7 +189,8 @@ define(['N/currentRecord', 'N/ui/message', 'N/url', 'N/https', 'N/search', 'N/re
                         params: {}
                     });
                     if(lengthSublist<500){ //condicion temporal hecha para forzar la ejecución del map reduce
-                        msgMR.show();            
+                        msgMR.show();
+                                
                     }
                     currentRd.setValue({fieldId: 'sublist_updatedata', value: JSON.stringify(arrSublist)});
                     //currentRd.save();
