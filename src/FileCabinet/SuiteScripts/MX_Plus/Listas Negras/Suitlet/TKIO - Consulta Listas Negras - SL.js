@@ -41,9 +41,9 @@ define(['N/log', 'N/record', 'N/search', 'N/ui/serverWidget', 'N/url', 'N/task',
                         
                         var sublistData = JSON.parse(parametros.sublist_updatedata);
                         log.debug('sublistData', sublistData);
-                       // if(sublistData.length>500){
+                       if(sublistData.length>500){
                         log.debug('sublistDataLength', sublistData.length);
-                        if(sublistData.length<500){ //Condicion de prueba creada para forzar la ejecución del map reduce
+                        //if(sublistData.length<500){ //Condicion de prueba creada para forzar la ejecución del map reduce
                             //setValue({fieldId: 'sublist_updatedata', value:sublistData});
                             //var sublistData = JSON.parse(parametros.sublist_updatedata);
 

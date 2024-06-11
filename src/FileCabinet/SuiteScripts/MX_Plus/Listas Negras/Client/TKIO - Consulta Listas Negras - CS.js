@@ -3,7 +3,7 @@
  * @NScriptType ClientScript
  * @NModuleScope SameAccount
  */
-define(['N/currentRecord', 'N/ui/message', 'N/url', 'N/https', 'N/search', 'N/record', 'N/runtime',  'N/email'],
+define(['N/currentRecord', 'N/ui/message', 'N/url', 'N/https', 'N/search', 'N/record', 'N/runtime',  'N/email','N/search'],
     /**
      * @param{currentRecord} currentRecord
      * @param{message} message
@@ -13,8 +13,9 @@ define(['N/currentRecord', 'N/ui/message', 'N/url', 'N/https', 'N/search', 'N/re
      * @param{record} record
      * @param{runtime} runtime
      * @param{email} email
+     * @param{search} search
      */
-    function (currentRecord, message, url, https, search, record, runtime, email) {
+    function (currentRecord, message, url, https, search, record, runtime, email,search) {
         /**
          * Function to be executed after page is initialized.
         *
@@ -44,10 +45,8 @@ define(['N/currentRecord', 'N/ui/message', 'N/url', 'N/https', 'N/search', 'N/re
                     let completedVendors = 0;
                     let updatePercentage = 0;
                     // if(arrIds.length<=500){ 
-                    if(arrIds.length>500){ //condicion temporal hecha para forzar la ejecución del map reduce
-                        
-                     for (let i = 0; i < arrIds.length; i++) {
-            
+                    if(arrIds.length>=500){ //condicion temporal hecha para forzar la ejecución del map reduce
+                        for (let i = 0; i < arrIds.length; i++) {
                                 var response = https.post.promise({
                                     url: serviceSL,
                                     body: JSON.stringify(arrIds[i]),
@@ -117,6 +116,7 @@ define(['N/currentRecord', 'N/ui/message', 'N/url', 'N/https', 'N/search', 'N/re
                                 })
                             
                             } 
+                            
                         }
                     }
             } catch (e) {
@@ -141,6 +141,11 @@ define(['N/currentRecord', 'N/ui/message', 'N/url', 'N/https', 'N/search', 'N/re
         function saveRecord(scriptContext) {
 
             try {
+                let msgConcurrency = message.create({
+                    title: "Otro proceso en curso",
+                    message: "Espere a que termine el proceso actual para continuar.",
+                    type: message.Type.WARNING
+                });
                 let msgMR = message.create({
                     title: "Proceso en curso",
                     message: "La cantidad de proveedores es alta. Se continuará este proceso de forma programada. Se enviará un correo cuando haya terminado.",
