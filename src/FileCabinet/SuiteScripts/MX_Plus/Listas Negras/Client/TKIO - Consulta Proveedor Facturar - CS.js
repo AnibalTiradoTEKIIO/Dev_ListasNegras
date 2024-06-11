@@ -243,12 +243,10 @@ function (currentRecord, log, search, message) {
                         search.createColumn(busquedaPvd)
                     ]
             });
-            var searchResultCount = estado_proveedor_recordSearchObj.runPaged().count;
-            log.debug("estado_proveedor_recordSearchObj result count", searchResultCount);
             estado_proveedor_recordSearchObj.run().each(function (result) {
-                log.debug({ title: 'result', details: result });
+                // log.debug({ title: 'result', details: result });
                 retStatus = result.getText(busquedaPvd) || ''
-                log.debug({ title: 'retStatus', details: retStatus });
+                // log.debug({ title: 'retStatus', details: retStatus });
             });
             return retStatus;
 

@@ -19,28 +19,6 @@ define(['N/log', 'N/search', 'N/ui/serverWidget', 'N/https', 'N/record', '../../
          */
         const onRequest = (scriptContext) => {
             try {
-                const remainingUsage = runtime.getCurrentScript().getRemainingUsage();
-                if (remainingUsage < 100) {
-                    // Crea una tarea Map/Reduce
-                    const mrTask = task.create({ taskType: task.TaskType.MAP_REDUCE });
-                    mrTask.scriptId = 'customscript_TKIO_MR_Listas_Negras'; 
-                    mrTask.deploymentId = 'customdeploy_TKIO_MR_Listas_Negras'; 
-                    mrTask.submit();
-            
-                    // Envía un correo electrónico a los administradores
-                    email.send({
-                        author: runtime.getCurrentUser().id,
-                        recipients: ['anibal.tirado@tekiio.mx'], 
-                        subject: 'Proceso de Listas Negras',
-                        body: 'El proceso de Listas Negras continuará de manera programada. Se enviará un correo cuando haya terminado.'
-                    });
-            
-                    // Termina la ejecución del Suitelet
-                    return;
-                }
-                // let results = { success: false, details: '', data: [] };
-                let parametros = JSON.parse(scriptContext.request.body);
-                log.debug('onRequest ~ parametros:', parametros)
 
                 const datosAuth = functions.getCompanyInformation();
                  log.debug('datosAuth', datosAuth);
@@ -186,6 +164,7 @@ define(['N/log', 'N/search', 'N/ui/serverWidget', 'N/https', 'N/record', '../../
             }
         }
         // Busqueda para el ID del Proveedor y el status 
+
         function getSearchId(valorFiltro, filtId, searchType) {
             try {
                 let resId = '';
