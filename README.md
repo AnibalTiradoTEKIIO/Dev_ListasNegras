@@ -1,19 +1,24 @@
 # Dev_ListasNegras
-Hubo bastantes cambios en el funcionamiento de listas negras
-Dentro de los siguientes puntos se consideran solo 3 archivos que fueron los modificados
-CS: TKIO - Consulta Listas Negras - CS
-SLS: TKIO - Consulta Listas Negras Service - SL
-SL: TKIO - Consulta Listas Negras - SL
+## Programas del Workspace
 
-#Se usa como herramienta las solicitudes post que manda el CS al SL, para desencadenar el MR desde el SL
+En este repositorio, encontrarás los siguientes programas relacionados con el funcionamiento de las listas negras:
 
-#Usamos tambien un registro auxiliar para almacenar un JSON con los RFC llamado sublist_updatedata
+1. **CS: TKIO - Consulta Listas Negras - CS**: Este programa se encarga de realizar consultas a las listas negras. Utiliza solicitudes POST para enviar datos al servicio SL y desencadenar el proceso de consulta.
 
-#Si hay menos de 500 proveedores, Este registro se usa en el PageInit del CS para recopilarlo en un arreglo y enviarlo al Service, la solicitud post.promise y la actualización de la progress bar se mantiene tal cual
+2. **SLS: TKIO - Consulta Listas Negras Service - SL**: Este programa es el servicio que recibe las solicitudes del programa CS. Se encarga de procesar las consultas y enviar los resultados de vuelta al CS.
 
-#Si hay mas de 500 proveedores, el SL lo detecta dentro del CASE 'POST' y lo envía a un MapReudce
+3. **SL: TKIO - Consulta Listas Negras - SL**: Este programa es el encargado de realizar las consultas a las listas negras. Recibe las solicitudes del servicio SLS y realiza las consultas correspondientes.
 
-#Todo el proceso del MR se traslada a un registro de seguimiento que nos da datos mas detallados 'Seguimiento Consulta Listas Negras'
+Además, se utilizan las siguientes herramientas y registros auxiliares:
 
-#Falta controlar que al recargaer la página crea otro registro de seguimiento, esto puede ser con un redirect.tosuitelet
+- **Sublist_updatedata**: Este registro auxiliar almacena un JSON con los RFC utilizados en las consultas a las listas negras.
 
+- Si el número de proveedores es menor a 500, el registro auxiliar se utiliza en el PageInit del programa CS para recopilar los proveedores en un arreglo y enviarlos al servicio. El proceso de solicitud POST y la actualización de la barra de progreso se mantienen sin cambios.
+
+- Si el número de proveedores es mayor a 500, el programa SL detecta esta condición y envía los datos a un proceso de MapReduce (MR) para su procesamiento.
+
+- Todo el proceso del MR se registra en el registro de seguimiento "Seguimiento Consulta Listas Negras", el cual proporciona datos más detallados sobre el proceso de consulta.
+
+- Se debe implementar un control para evitar la creación de múltiples registros de seguimiento al recargar la página. Esto se puede lograr utilizando un redireccionamiento a un Suitelet.
+
+¡No dudes en explorar los programas y registros auxiliares mencionados para obtener más información sobre el funcionamiento de las listas negras en este proyecto!
