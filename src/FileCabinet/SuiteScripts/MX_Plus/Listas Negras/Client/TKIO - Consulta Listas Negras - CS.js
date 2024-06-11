@@ -72,9 +72,6 @@ define(['N/currentRecord', 'N/ui/message', 'N/url', 'N/https', 'N/search', 'N/re
                                             type: message.Type.CONFIRMATION
                                         });
                                         msgPvdValid.show({ duration: 30000 });
-                                        setTimeout(function () {
-                                            window.location.reload();
-                                        }, 1000);
                                         // setTimeout(function () {
                                         //     const urlSuitlet = url.resolveScript({
                                         //         deploymentId: 'customdeploy_tkio_consulta_list_neg_sl',
@@ -94,7 +91,7 @@ define(['N/currentRecord', 'N/ui/message', 'N/url', 'N/https', 'N/search', 'N/re
                                     if(completedVendors==arrIds.length){
                                         var msgPvdValid = message.create({
                                             title: "Proveedor(es) Validado(s)",
-                                            message: "No se han logrado validar todos los proveedores, el porcentaje de validación es del "+updatePercentage+"%",
+                                            message: "Se han logrado validar todos los proveedores, el porcentaje de validación es del "+updatePercentage+"%",
                                             type: message.Type.CONFIRMATION
                                         });
                                         msgPvdValid.show({ duration: 30000 });
@@ -107,10 +104,19 @@ define(['N/currentRecord', 'N/ui/message', 'N/url', 'N/https', 'N/search', 'N/re
                                         //     window.open(urlSuitlet, '_self');
                                         // }, 10000);  
                                     }  
-                                
+                                    // var msgErrorRedir = message.create({
+                                    //     title: "Error al validar",
+                                    //     message: "Error al validar RFC en listas negras. " + reason,
+                                    //     type: message.Type.ERROR
+                                    // });
+                                    // msgErrorRedir.show({ duration: 10000 });
                                     log.debug({
                                         title: 'Invalid Request: ',
                                         details: reason
+                                    });
+                                    console.log({
+                                        title: 'Invalid Request: ',
+                                        details: {reason:reason, ID: arrIds[i]}
                                     });
                                 })
                             
@@ -192,7 +198,7 @@ define(['N/currentRecord', 'N/ui/message', 'N/url', 'N/https', 'N/search', 'N/re
                     //     scriptId: 'customscript_tkio_consulta_list_neg_sl',
                     //     params: {}
                     // });
-                    if(lengthSublist<=500){ 
+                    if(lengthSublist>=500){ 
                         msgMR.show();
                                 
                     }

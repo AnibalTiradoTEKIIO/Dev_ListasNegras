@@ -19,6 +19,10 @@ define(['N/log', 'N/search', 'N/ui/serverWidget', 'N/https', 'N/record', '../../
          */
         const onRequest = (scriptContext) => {
             try {
+             
+                // let results = { success: false, details: '', data: [] };
+                let parametros = JSON.parse(scriptContext.request.body);
+                log.debug('onRequest ~ parametros:', parametros)
 
                 const datosAuth = functions.getCompanyInformation();
                  log.debug('datosAuth', datosAuth);
@@ -164,7 +168,6 @@ define(['N/log', 'N/search', 'N/ui/serverWidget', 'N/https', 'N/record', '../../
             }
         }
         // Busqueda para el ID del Proveedor y el status 
-
         function getSearchId(valorFiltro, filtId, searchType) {
             try {
                 let resId = '';
