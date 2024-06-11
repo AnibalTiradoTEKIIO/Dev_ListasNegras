@@ -2,8 +2,8 @@
  * @NApiVersion 2.1
  * @NScriptType MapReduceScript
  */
-define(['N/email', 'N/runtime', 'N/search', 'N/record', '../../lib/access_pac', '../../lib/functions_gbl','N/https'],
-    (email, runtime, search, record, access_pac, functions,https) => {
+define(['N/email', 'N/runtime', 'N/search', 'N/record', '../../lib/access_pac', '../../lib/functions_gbl','N/https','N/format'],
+    (email, runtime, search, record, access_pac, functions,https,format) => {
         function getInputData(inputContext) {
            try {
             var scriptParameters= runtime.getCurrentScript().getParameter({name: 'custscript_tkio_vendor_dataupdate'});
@@ -21,54 +21,88 @@ define(['N/email', 'N/runtime', 'N/search', 'N/record', '../../lib/access_pac', 
             // Procesa cada registro individualmente
         try {
             const parametros = JSON.parse(mapContext.value);
-            log.debug('map ~ parametros:', parametros)
+            log.debug('map ~ parametros:', parametros);
             const datosAuth = functions.getCompanyInformation();
-                 log.debug('datosAuth', datosAuth);
-                const { COMPANY, MX_PLUS_CONFIG } = functions;
-                 log.debug('COMPANY', COMPANY);
-                const configAll = functions.getConfig();
-                 log.debug('configAll', configAll);
-                let services, apis
-                if (configAll[MX_PLUS_CONFIG.FIELDS.TEST_MODE] == true) {
-                    services = access_pac.testURL.services
-                    apis = access_pac.testURL.apis
-                } else {
-                    services = access_pac.prodURL.services
-                    apis = access_pac.prodURL.apis
-                }
+            log.debug('datosAuth', datosAuth);
+            const { COMPANY, MX_PLUS_CONFIG } = functions;
+            log.debug('COMPANY', COMPANY);
+            const configAll = functions.getConfig();
+            log.debug('configAll', configAll);
+    
+            let services, apis;
+            if (configAll[MX_PLUS_CONFIG.FIELDS.TEST_MODE] === true) {
+                services = access_pac.testURL.services;
+                apis = access_pac.testURL.apis;
+            } else {
+                services = access_pac.prodURL.services;
+                apis = access_pac.prodURL.apis;
+            }
+    
+            const urlToken = access_pac.resolveURL(services, access_pac.accessPoints.authentication);
+            log.debug('urlToken', urlToken);
+    
+            const getToken = access_pac.getTokenAccess(urlToken, datosAuth[COMPANY.FIELDS.EMAIL]);
+            log.debug('getToken', getToken.data.token);
+            const tokenSW = getToken.data.token;
+            log.debug('tokenSW', getToken.data.token);
+    
+            let results = {};
+            let situacion = [];
+            results = getListaNegra(services, tokenSW, parametros.rfc);
+            log.debug('results', results);
+            if (results.success) {
+                situacion.push(results.situacion);
+            } else {
+                // Handle case where results are not successful
+            }
+    
+            log.debug('onRequest ~ situacion:', situacion);
+            results.data = parametros;
+            results.situacion = situacion;
+            results.details = 'Se ha validado un proveedor';
+            log.debug('map ~ results:', results);
+    
+            var param = runtime.getCurrentScript().getParameter({ name: 'custscript_tkio_vendor_dataupdate' });
+            if (!param) {
+                throw new Error('Parameter custscript_tkio_vendor_dataupdate is not set.');
+            }
+    
+            var parsedParam;
+            try {
+                parsedParam = JSON.parse(param);
+            } catch (e) {
+                throw new Error('Failed to parse custscript_tkio_vendor_dataupdate parameter: ' + e.message);
+            }
+    
+            var idSeguimiento = parsedParam.seguimientoId;
+            if (!idSeguimiento) {
+                throw new Error('seguimientoId is not defined in the parameter.');
+            }
+    
+            // Load the record safely
+            var seguimiento = record.load({ type: 'customrecord_tkio_consulta_list_neg_seg', id: idSeguimiento });
+            if (!seguimiento) {
+                throw new Error('Failed to load the record with ID: ' + idSeguimiento);
+            }
+    
+            // Retrieve and parse the processed count and total count safely
+            var procesados = Number(seguimiento.getValue({ fieldId: 'custrecord_tkio_listas_negras_procesados' }));
+            var total = Number(seguimiento.getValue({ fieldId: 'custrecord_tkio_listas_negras_data' }));
+    
+            if (isNaN(procesados) || isNaN(total)) {
+                throw new Error('Failed to retrieve valid numbers for processed or total count.');
+            }
+    
+            procesados += 1;
+            seguimiento.setValue({ fieldId: 'custrecord_tkio_listas_negras_procesados', value: procesados });
 
-                const urlToken = access_pac.resolveURL(services, access_pac.accessPoints.authentication);
-                 log.debug('urlToken', urlToken);
-
-                const getToken = access_pac.getTokenAccess(urlToken, datosAuth[COMPANY.FIELDS.EMAIL]);
-                log.debug('getToken', getToken.data.token);
-                const tokenSW = getToken.data.token;
-                 log.debug('tokenSW', getToken.data.token);
-                let results = {};
-                let situacion = [];
-                    results = getListaNegra(services, tokenSW, parametros.rfc)
-                    log.debug('results', results);
-                    if (results.success) {
-                        situacion.push(results.situacion);
-                    } else {
-                        // mapContext.response.write({
-                        //     output: ''
-                        // });
-                    }
-                
-                log.debug('onRequest ~ situacion:', situacion)
-                results.data = parametros
-                results.situacion = situacion;
-                results.details = 'Se ha validado un proveedor';
-                // mapContext.response.write({
-                //     output: JSON.stringify(results)
-                // });
-                log.debug('map ~ results:', results)
-                var idSeguimiento= JSON.parse(runtime.getCurrentScript().getParameter({name: 'custscript_tkio_vendor_dataupdate'})).seguimientoId;
-                var seguimiento=record.load({type: 'customrecord_tkio_consulta_list_neg_seg', id: idSeguimiento});
-                var procesados= Number(seguimiento.getValue({fieldId: 'custrecord_tkio_listas_negras_procesados'}));
-                seguimiento.setValue({fieldId: 'custrecord_tkio_listas_negras_procesados', value: procesados+1});
-                seguimiento.save();
+            var calculo = total > 0 ? (procesados / total) *100 : 0;
+            calculo=format.parse({value: calculo+'%', type: format.Type.PERCENT});
+            seguimiento.setValue({fieldId: 'custrecord_tkio_listas_negras_progreso', value: calculo});
+            seguimiento.save();
+    
+            log.debug('map ~ porcentaje:', calculo);
+    
         }
         catch (error) {
             log.error('map ~ error:', error)
@@ -77,10 +111,9 @@ define(['N/email', 'N/runtime', 'N/search', 'N/record', '../../lib/access_pac', 
     }
 
 
+
         function reduce(context) {
-            var idSeguimiento= JSON.parse(runtime.getCurrentScript().getParameter({name: 'custscript_tkio_vendor_dataupdate'})).seguimientoId;
-            var seguimiento=record.load({type: 'customrecord_tkio_consulta_list_neg_seg', id: idSeguimiento});
-            seguimiento.setValue({fieldId: 'custrecordtkio_listas_negras_status', value: 1});
+           
           
         }
 
@@ -92,6 +125,10 @@ define(['N/email', 'N/runtime', 'N/search', 'N/record', '../../lib/access_pac', 
                 subject: 'Proceso de Listas Negras',
                 body: 'El proceso de Listas Negras ha terminado.'
             });
+            var idSeguimiento= JSON.parse(runtime.getCurrentScript().getParameter({name: 'custscript_tkio_vendor_dataupdate'})).seguimientoId;
+            var seguimiento=record.load({type: 'customrecord_tkio_consulta_list_neg_seg', id: idSeguimiento});
+            seguimiento.setValue({fieldId: 'custrecordtkio_listas_negras_status', value: 1});
+            seguimiento.save();
     //             N.search.create({
     //     type: 'customrecord_temp_data',
     // }).run().each(function(result) {
@@ -177,6 +214,7 @@ define(['N/email', 'N/runtime', 'N/search', 'N/record', '../../lib/access_pac', 
                 return ''
             }
         }
+        
         return {
             getInputData: getInputData,
             map: map,
@@ -185,3 +223,4 @@ define(['N/email', 'N/runtime', 'N/search', 'N/record', '../../lib/access_pac', 
         };
     });
     
+
