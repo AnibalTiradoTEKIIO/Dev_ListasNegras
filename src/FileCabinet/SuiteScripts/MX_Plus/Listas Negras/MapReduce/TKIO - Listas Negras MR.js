@@ -5,12 +5,16 @@
 define(['N/email', 'N/runtime', 'N/search', 'N/record', '../../lib/access_pac', '../../lib/functions_gbl','N/https'],
     (email, runtime, search, record, access_pac, functions,https) => {
         function getInputData(inputContext) {
+           try {
             var scriptParameters= runtime.getCurrentScript().getParameter({name: 'custscript_tkio_vendor_dataupdate'});
             var pendingVendors = JSON.parse(scriptParameters);
             
                 // var pendingVendors = JSON.parse(inputContext.script.params.custscript_pending_vendors);
                 log.debug('pendingVendors', pendingVendors);
                 return pendingVendors.sublistData;
+           } catch (error) {
+            log.error('getInputData ~ error:', error)
+           }
             }
 
         function map(mapContext) {
