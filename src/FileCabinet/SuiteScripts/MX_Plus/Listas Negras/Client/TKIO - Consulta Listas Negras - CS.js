@@ -44,8 +44,8 @@ define(['N/currentRecord', 'N/ui/message', 'N/url', 'N/https', 'N/search', 'N/re
                     let validados = 0;
                     let completedVendors = 0;
                     let updatePercentage = 0;
-                    // if(arrIds.length<=500){ 
-                    if(arrIds.length>=500){ //condicion temporal hecha para forzar la ejecución del map reduce
+                    if(arrIds.length<=500){ 
+                    //if(arrIds.length>=500){ //condicion temporal hecha para forzar la ejecución del map reduce
                         for (let i = 0; i < arrIds.length; i++) {
                                 var response = https.post.promise({
                                     url: serviceSL,
@@ -188,11 +188,11 @@ define(['N/currentRecord', 'N/ui/message', 'N/url', 'N/https', 'N/search', 'N/re
                 
                 if(lengthSublist>0){ 
                     var sublistData = JSON.stringify(arrSublist);
-                    const suiteletUrl   = url.resolveScript({
-                        deploymentId: 'customdeploy_tkio_consulta_list_neg_s_sl',
-                        scriptId: 'customscript_tkio_consulta_list_neg_sl',
-                        params: {}
-                    });
+                    // const suiteletUrl   = url.resolveScript({
+                    //     deploymentId: 'customdeploy_tkio_consulta_list_neg_s_sl',
+                    //     scriptId: 'customscript_tkio_consulta_list_neg_sl',
+                    //     params: {}
+                    // });
                     if(lengthSublist<500){ //condicion temporal hecha para forzar la ejecución del map reduce
                         msgMR.show();
                                 
@@ -320,7 +320,7 @@ define(['N/currentRecord', 'N/ui/message', 'N/url', 'N/https', 'N/search', 'N/re
                     type: message.Type.ERROR
                 });
                 msgErrorRedir.show({ duration: 3000 });
-
+                console.log('ERROR',e);
                 return false;
             }
               
