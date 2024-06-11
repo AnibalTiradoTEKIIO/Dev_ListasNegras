@@ -65,7 +65,7 @@ define(['N/currentRecord', 'N/ui/message', 'N/url', 'N/https', 'N/search', 'N/re
                                         details: response
                                     });
                                     if(completedVendors==arrIds.length){
-                                        msgValida.hide();
+                                        
                                         var msgPvdValid = message.create({
                                             title: "Proveedor(es) Validado(s)",
                                             message: "Se han validado los proveedores seleccionados",
@@ -92,7 +92,6 @@ define(['N/currentRecord', 'N/ui/message', 'N/url', 'N/https', 'N/search', 'N/re
                                     console.log('PORCENTAJE',updatePercentage);
                                     updateProgressBar(updatePercentage);
                                     if(completedVendors==arrIds.length){
-                                        msgValida.hide();
                                         var msgPvdValid = message.create({
                                             title: "Proveedor(es) Validado(s)",
                                             message: "No se han logrado validar todos los proveedores, el porcentaje de validación es del "+updatePercentage+"%",
@@ -193,7 +192,7 @@ define(['N/currentRecord', 'N/ui/message', 'N/url', 'N/https', 'N/search', 'N/re
                     //     scriptId: 'customscript_tkio_consulta_list_neg_sl',
                     //     params: {}
                     // });
-                    if(lengthSublist<500){ //condicion temporal hecha para forzar la ejecución del map reduce
+                    if(lengthSublist<=500){ 
                         msgMR.show();
                                 
                     }
