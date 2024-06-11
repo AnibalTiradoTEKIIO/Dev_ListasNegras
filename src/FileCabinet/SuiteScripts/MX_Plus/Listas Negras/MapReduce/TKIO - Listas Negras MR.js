@@ -74,10 +74,10 @@ define(['N/email', 'N/runtime', 'N/search', 'N/record', '../../lib/access_pac', 
 
 
         function reduce(context) {
-            // // Consolida los resultados
-            // for (let i in context.values) {
-            //     // Procesa los resultados
-            // }
+            var idSeguimiento= JSON.parse(runtime.getCurrentScript().getParameter({name: 'custscript_tkio_vendor_dataupdate'})).seguimientoId;
+            var seguimiento=record.load({type: 'customrecord_tkio_consulta_list_neg_seg', id: idSeguimiento});
+            seguimiento.setValue({fieldId: 'custrecordtkio_listas_negras_status', value: 1});
+          
         }
 
         function summarize(context) {
